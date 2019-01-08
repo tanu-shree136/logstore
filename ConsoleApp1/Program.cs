@@ -1,14 +1,6 @@
 ﻿using Microsoft.TeamFoundation.TestClient.PublishTestResults;
-using Microsoft.TeamFoundation.TestManagement.WebApi;
-using Microsoft.VisualStudio.Services.OAuth;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Services.FeatureAvailability.WebApi;
-using Microsoft.VisualStudio.Services.TestResults.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 
 namespace ConsoleApp1
@@ -31,8 +23,18 @@ namespace ConsoleApp1
             Console.WriteLine("\nProvide path for source:");
             string sourcePathForRun = Console.ReadLine();
 
-            publisher.PublishLogStoreRunLevelAttachment(_testLogStore, projectId, runId, sourcePathForRun).Wait();
-            Console.WriteLine("Upload completed..");
+            publisher.UploadRunLevelAttachment(_testLogStore, projectId, runId, sourcePathForRun).Wait();
+
+            Console.WriteLine("\nUpload directory run level attachment ...........................");
+            Console.WriteLine("\nProvide path for source directory:");
+            string sourcePathForRunDir = Console.ReadLine();
+
+            Console.WriteLine("\nProvide path for destination directory:");
+            string sourcePathForRunDestDir = Console.ReadLine();
+
+            publisher.UploadRunDirectoryAttachment(_testLogStore, projectId, runId, sourcePathForRunDir, sourcePathForRunDestDir).Wait();
+
+            Console.WriteLine("\n\nUploading result level attachment .................");
 
             Console.WriteLine("\nEnter result Id");
             int resultId = int.Parse(Console.ReadLine());
@@ -40,9 +42,8 @@ namespace ConsoleApp1
             Console.WriteLine("\nProvide path for source:");
             string sourcePathForResult = Console.ReadLine();
 
-            publisher.PublishLogStoreResultLevelAttachment(_testLogStore, projectId, runId, resultId, sourcePathForResult).Wait();
+            publisher.UploadResultLevelAttachment(_testLogStore, projectId, runId, resultId, sourcePathForResult).Wait();
 
-            Console.WriteLine("Upload completed..");
             Console.WriteLine("\n\n\nDownload logstore ...........................");
             Console.WriteLine("\nEnter run Id");
             int runIdForDownload = int.Parse(Console.ReadLine());
@@ -59,9 +60,8 @@ namespace ConsoleApp1
             Console.WriteLine("\nProvide path for source:");
             string sourcePathForResultForBuild = Console.ReadLine();
 
-            publisher.PublishLogstoreBuildLevelAttachment(_testLogStore, projectId, buildId, sourcePathForResultForBuild).Wait();
-            Console.WriteLine("Upload completed..");
-
+            publisher.UploadBuildLevelAttachment(_testLogStore, projectId, buildId, sourcePathForResultForBuild).Wait();
+            
             Console.WriteLine("\nUpload directory build level attachment ...........................");
             Console.WriteLine("\nProvide path for source directory:");
             string sourcePathForResultForBuildDir = Console.ReadLine();
@@ -69,9 +69,8 @@ namespace ConsoleApp1
             Console.WriteLine("\nProvide path for destination directory:");
             string sourcePathForResultForBuildDestDir = Console.ReadLine();
 
-            publisher.PublishLogstoreBuildDirectoryAttachment(_testLogStore, projectId, buildId, sourcePathForResultForBuildDir, sourcePathForResultForBuildDestDir).Wait();
-            Console.WriteLine("Upload completed..");
-
+            publisher.UploadBuildDirectoryAttachment(_testLogStore, projectId, buildId, sourcePathForResultForBuildDir, sourcePathForResultForBuildDestDir).Wait();
+            
             //Disposing test log store object after use
             _testLogStore.Dispose();
 
@@ -83,7 +82,7 @@ namespace ConsoleApp1
         private static VssConnection getVssConnection()
         {
             var accessToken = "<Enter pat token>";
-            var collectionUrl = "<Enter your collection>"; //for example - https://dev.azure.com/mseng/;
+            var collectionUrl = "<Enter your collection>"; //for example - https://dev.azure.com/<accountName>/;
             if (string.IsNullOrEmpty(accessToken))
             {
                 Console.WriteLine("Access Token is null or empty");

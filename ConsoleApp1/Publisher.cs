@@ -1,10 +1,7 @@
 ﻿using Microsoft.TeamFoundation.TestClient.PublishTestResults;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
-using Microsoft.VisualStudio.Services.TestResults.WebApi;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,7 +17,7 @@ namespace ConsoleApp1
         /// <param name="runId"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public async Task<TestLogStatus> PublishLogStoreRunLevelAttachment(ITestLogStore _testLogStore, string projectId, int runId, string filePath)
+        public async Task<TestLogStatus> UploadRunLevelAttachment(ITestLogStore _testLogStore, string projectId, int runId, string filePath)
         {
             try
             {
@@ -29,10 +26,56 @@ namespace ConsoleApp1
 
                 Console.WriteLine("\nUpload started..");
                 testLogResult = await _testLogStore.UploadTestRunLogAsync(new Guid(projectId), runId, 0, 0, TestLogType.GeneralAttachment, filePath, null, "", true, cancellationToken).ConfigureAwait(false);
-                   
+                if(testLogResult.Status == TestLogStatusCode.Success)
+                {
+                    Console.WriteLine("Upload completed...");
+                }
+                else
+                {
+                    Console.WriteLine("Upload failed..."+testLogResult.Exception);
+                }
+
                 return testLogResult;
             }
             catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Upload directory for run
+        /// </summary>
+        /// <param name="_testLogStore"></param>
+        /// <param name="projectId"></param>
+        /// <param name="runId"></param>
+        /// <param name="logDirectoryPath"></param>
+        /// <param name="destinationDirectoryPath"></param>
+        /// <returns></returns>
+        public async Task<TestLogStatus> UploadRunDirectoryAttachment(ITestLogStore _testLogStore, string projectId, int runId, string logDirectoryPath, string destinationDirectoryPath)
+        {
+            try
+            {
+
+
+                TestLogStatus testLogResult = null;
+                var cancellationToken = new CancellationToken();
+
+                Console.WriteLine("\nUpload started..");
+                testLogResult = await _testLogStore.UploadTestRunDirectoryAsync(new Guid(projectId), runId, 0, 0, TestLogType.GeneralAttachment, logDirectoryPath, null, destinationDirectoryPath, cancellationToken).ConfigureAwait(false);
+                if (testLogResult.Status == TestLogStatusCode.Success)
+                {
+                    Console.WriteLine("Upload completed...");
+                }
+                else
+                {
+                    Console.WriteLine("Upload failed..." + testLogResult.Exception);
+                }
+
+                return testLogResult;
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 return null;
@@ -48,7 +91,7 @@ namespace ConsoleApp1
         /// <param name="resultId"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public async Task<TestLogStatus> PublishLogStoreResultLevelAttachment(ITestLogStore _testLogStore, string projectId, int runId, int resultId, string filePath)
+        public async Task<TestLogStatus> UploadResultLevelAttachment(ITestLogStore _testLogStore, string projectId, int runId, int resultId, string filePath)
         {
             try
             {
@@ -59,7 +102,15 @@ namespace ConsoleApp1
 
                 Console.WriteLine("\nUpload started..");
                 testLogResult = await _testLogStore.UploadTestRunLogAsync(new Guid(projectId), runId, resultId, 0, TestLogType.GeneralAttachment, filePath, null, "", true, cancellationToken).ConfigureAwait(false);
-                
+                if (testLogResult.Status == TestLogStatusCode.Success)
+                {
+                    Console.WriteLine("Upload completed...");
+                }
+                else
+                {
+                    Console.WriteLine("Upload failed..." + testLogResult.Exception);
+                }
+
                 return testLogResult;
             }
             catch (Exception ex)
@@ -121,7 +172,7 @@ namespace ConsoleApp1
         /// <param name="buildId"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public async Task<TestLogStatus> PublishLogstoreBuildLevelAttachment(ITestLogStore _testLogStore, string projectId, int buildId, string filePath)
+        public async Task<TestLogStatus> UploadBuildLevelAttachment(ITestLogStore _testLogStore, string projectId, int buildId, string filePath)
         {
             try
             {
@@ -132,7 +183,15 @@ namespace ConsoleApp1
 
                 Console.WriteLine("\nUpload started..");
                 testLogResult = await _testLogStore.UploadTestBuildLogAsync(new Guid(projectId), buildId, TestLogType.GeneralAttachment, filePath, null, "", true, cancellationToken).ConfigureAwait(false);
-                
+                if (testLogResult.Status == TestLogStatusCode.Success)
+                {
+                    Console.WriteLine("Upload completed...");
+                }
+                else
+                {
+                    Console.WriteLine("Upload failed..." + testLogResult.Exception);
+                }
+
                 return testLogResult;
             }
             catch (Exception ex)
@@ -151,7 +210,7 @@ namespace ConsoleApp1
         /// <param name="logDirectoryPath"></param>
         /// <param name="destinationDirectoryPath"></param>
         /// <returns></returns>
-        public async Task<TestLogStatus> PublishLogstoreBuildDirectoryAttachment(ITestLogStore _testLogStore, string projectId, int buildId, string logDirectoryPath, string destinationDirectoryPath)
+        public async Task<TestLogStatus> UploadBuildDirectoryAttachment(ITestLogStore _testLogStore, string projectId, int buildId, string logDirectoryPath, string destinationDirectoryPath)
         {
             try
             {
@@ -162,6 +221,14 @@ namespace ConsoleApp1
 
                 Console.WriteLine("\nUpload started..");
                 testLogResult = await _testLogStore.UploadTestBuildDirectoryAsync(new Guid(projectId), buildId, TestLogType.GeneralAttachment, logDirectoryPath, null, destinationDirectoryPath, cancellationToken).ConfigureAwait(false);
+                if (testLogResult.Status == TestLogStatusCode.Success)
+                {
+                    Console.WriteLine("Upload completed...");
+                }
+                else
+                {
+                    Console.WriteLine("Upload failed..." + testLogResult.Exception);
+                }
 
                 return testLogResult;
             }
